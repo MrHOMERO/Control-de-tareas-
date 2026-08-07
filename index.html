@@ -191,13 +191,13 @@
     <div class="form-group">
         <label for="daySelect">Selecciona el Día:</label>
         <select id="daySelect">
-            <option value="Lunes">Lunes</option>
-            <option value="Martes">Martes</option>
-            <option value="Miércoles">Miércoles</option>
-            <option value="Jueves">Jueves</option>
-            <option value="Viernes">Viernes</option>
-            <option value="Sábado">Sábado</option>
-            <option value="Domingo">Domingo</option>
+            <option value="1">Lunes</option>
+            <option value="2">Martes</option>
+            <option value="3">Miércoles</option>
+            <option value="4">Jueves</option>
+            <option value="5">Viernes</option>
+            <option value="6">Sábado</option>
+            <option value="0">Domingo</option>
         </select>
     </div>
 
@@ -222,6 +222,30 @@
 <script>
     let tasks = [];
 
+    // Seleccionar por defecto el día actual de la semana al abrir la app
+    window.onload = function() {
+        const todayDayIndex = new Date().getDay(); // 0 es Domingo, 1 es Lunes, etc.
+        document.getElementById('daySelect').value = todayDayIndex;
+    };
+
+    function getTargetDate(targetDayIndex) {
+        const now = new Date();
+        const currentDayIndex = now.getDay(); // 0-6
+        
+        // Calcular la diferencia de días hacia adelante para el próximo día seleccionado
+        let diff = targetDayIndex - currentDayIndex;
+        if (diff <= 0) {
+            diff += 7; // Si ya pasó o es hoy, toma el de la próxima semana
+        }
+        
+        const targetDate = new Date(now);
+        targetDate.setDate(now.getDate() + diff);
+        
+        // Formatear la fecha bonita en español (ej: "Martes, 11 de agosto de 2026")
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        return targetDate.toLocaleDateString('es-ES', options);
+    }
+
     function addTask() {
         const input = document.getElementById('newTaskInput');
         const taskName = input.value.trim();
@@ -234,7 +258,7 @@
         const newTask = {
             id: Date.now(),
             name: taskName,
-            status: "Terminado" // Por defecto arranca como terminado
+            status: "Terminado"
         };
 
         tasks.push(newTask);
@@ -283,7 +307,9 @@
     }
 
     function sendToWhatsApp() {
-        const selectedDay = document.getElementById('daySelect').value;
+        const daySelect = document.getElementById('daySelect');
+        const selectedDayIndex = parseInt(daySelect.value);
+        const fechaExacta = getTargetDate(selectedDayIndex);
         const telefonoDestino = "59896643887";
         
         if (tasks.length === 0) {
@@ -291,7 +317,7 @@
             return;
         }
 
-        let message = `📋 *ESTADO OPERATIVO - CARNICERÍA* 🥩\n📅 *Día:* ${selectedDay}\n\n`;
+        let message = `📋 *Listas de tareas para hoy* 🥩\n📅 *Fecha:* ${fechaExacta}\n\n`;
         
         const terminadas = tasks.filter(t => t.status === 'Terminado');
         const pendientes = tasks.filter(t => t.status === 'Pendiente');
