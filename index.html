@@ -323,7 +323,7 @@
         const pendientes = tasks.filter(t => t.status === 'Pendiente');
 
         if (terminadas.length > 0) {
-            message += `✅ *Realizadas:*\n`;
+            message += `✅ *A REALIZAR:*\n`;
             terminadas.forEach(t => {
                 message += `• ${t.name}\n`;
             });
