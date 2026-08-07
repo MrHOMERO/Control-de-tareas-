@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Muu Steak House - Control de Tareas</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --success-color: #27ae60;
+            --pending-color: #e74c3c;
+            --bg-color: #f4f6f7;
+            --card-bg: #ffffff;
+            --text-color: #333333;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 15px;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        h2 {
+            text-align: center;
+            color: var(--primary-color);
+            margin-bottom: 5px;
+            font-size: 20px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #7f8c8d;
+            font-size: 13px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 6px;
+            font-size: 14px;
+        }
+
+        select, input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 15px;
+            box-sizing: border-box;
+            background-color: #fff;
+        }
+
+        .input-row {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-add {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0 15px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .btn-add:hover {
+            background-color: #1a252f;
+        }
+
+        .task-list-container {
+            margin-top: 20px;
+            border-top: 2px solid #eee;
+            padding-top: 15px;
+        }
+
+        .task-card {
+            background: #f9f9f9;
+            padding: 10px 12px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #e1e8ed;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .task-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .task-text {
+            font-weight: 600;
+            font-size: 14px;
+            color: #2c3e50;
+            word-break: break-word;
+            flex: 1;
+        }
+
+        .btn-delete {
+            background: none;
+            border: none;
+            color: #e74c3c;
+            cursor: pointer;
+            font-size: 16px;
+            padding: 0 5px;
+        }
+
+        .status-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .status-btn {
+            flex: 1;
+            padding: 6px;
+            border: 1.5px solid #ccc;
+            border-radius: 5px;
+            background: #fff;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 12px;
+            transition: all 0.2s;
+            text-align: center;
+        }
+
+        .status-btn.terminado.active {
+            background-color: var(--success-color);
+            color: white;
+            border-color: var(--success-color);
+        }
+
+        .status-btn.pendiente.active {
+            background-color: var(--pending-color);
+            color: white;
+            border-color: var(--pending-color);
+        }
+
+        .btn-whatsapp {
+            width: 100%;
+            background-color: #25d366;
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: background 0.2s;
+        }
+
+        .btn-whatsapp:hover {
+            background-color: #1ebe57;
+        }
+
+        .empty-msg {
+            color: #888;
+            font-size: 13px;
+            text-align: center;
+            margin: 15px 0;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>🥩 Muu Steak House</h2>
+    <div class="subtitle">Control Diario de Tareas - Carnicería</div>
+    
+    <div class="form-group">
+        <label for="daySelect">Selecciona el Día:</label>
+        <select id="daySelect">
+            <option value="Lunes">Lunes</option>
+            <option value="Martes">Martes</option>
+            <option value="Miércoles">Miércoles</option>
+            <option value="Jueves">Jueves</option>
+            <option value="Viernes">Viernes</option>
+            <option value="Sábado">Sábado</option>
+            <option value="Domingo">Domingo</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="newTaskInput">Escribir Nueva Tarea:</label>
+        <div class="input-row">
+            <input type="text" id="newTaskInput" placeholder="Ej. Limpiar sierra principal...">
+            <button type="button" class="btn-add" onclick="addTask()">＋</button>
+        </div>
+    </div>
+
+    <div class="task-list-container">
+        <label>Lista de Tareas para Hoy:</label>
+        <div id="dynamicTaskList">
+            <div class="empty-msg">No hay tareas agregadas todavía. Escribe una arriba.</div>
+        </div>
+    </div>
+
+    <button type="button" class="btn-whatsapp" onclick="sendToWhatsApp()">💬 Copiar y Enviar a WhatsApp</button>
+</div>
+
+<script>
+    let tasks = [];
+
+    function addTask() {
+        const input = document.getElementById('newTaskInput');
+        const taskName = input.value.trim();
+
+        if (taskName === "") {
+            alert("Por favor escribe una tarea antes de agregarla.");
+            return;
+        }
+
+        const newTask = {
+            id: Date.now(),
+            name: taskName,
+            status: "Terminado" // Por defecto arranca como terminado
+        };
+
+        tasks.push(newTask);
+        input.value = "";
+        renderTasks();
+    }
+
+    function deleteTask(id) {
+        tasks = tasks.filter(t => t.id !== id);
+        renderTasks();
+    }
+
+    function setStatus(id, status) {
+        const task = tasks.find(t => t.id === id);
+        if (task) {
+            task.status = status;
+            renderTasks();
+        }
+    }
+
+    function renderTasks() {
+        const container = document.getElementById('dynamicTaskList');
+        
+        if (tasks.length === 0) {
+            container.innerHTML = '<div class="empty-msg">No hay tareas agregadas todavía. Escribe una arriba.</div>';
+            return;
+        }
+
+        container.innerHTML = "";
+        tasks.forEach(t => {
+            const card = document.createElement('div');
+            card.className = 'task-card';
+            
+            card.innerHTML = `
+                <div class="task-info">
+                    <span class="task-text">${t.name}</span>
+                    <button class="btn-delete" onclick="deleteTask(${t.id})" title="Eliminar tarea">✕</button>
+                </div>
+                <div class="status-buttons">
+                    <button type="button" class="status-btn terminado ${t.status === 'Terminado' ? 'active' : ''}" onclick="setStatus(${t.id}, 'Terminado')">✅ Terminado</button>
+                    <button type="button" class="status-btn pendiente ${t.status === 'Pendiente' ? 'active' : ''}" onclick="setStatus(${t.id}, 'Pendiente')">⚠️ Pendiente</button>
+                </div>
+            `;
+            container.appendChild(card);
+        });
+    }
+
+    function sendToWhatsApp() {
+        const selectedDay = document.getElementById('daySelect').value;
+        
+        if (tasks.length === 0) {
+            alert("Agrega al menos una tarea antes de enviar el reporte.");
+            return;
+        }
+
+        let message = `📋 *ESTADO OPERATIVO - CARNICERÍA* 🥩\n📅 *Día:* ${selectedDay}\n\n`;
+        
+        const terminadas = tasks.filter(t => t.status === 'Terminado');
+        const pendientes = tasks.filter(t => t.status === 'Pendiente');
+
+        if (terminadas.length > 0) {
+            message += `✅ *Realizadas:*\n`;
+            terminadas.forEach(t => {
+                message += `• ${t.name}\n`;
+            });
+            message += `\n`;
+        }
+
+        if (pendientes.length > 0) {
+            message += `⚠️ *Pendientes:*\n`;
+            pendientes.forEach(t => {
+                message += `• ${t.name}\n`;
+            });
+        }
+
+        // Copiar al portapapeles y abrir WhatsApp
+        navigator.clipboard.writeText(message).then(() => {
+            alert("¡Reporte copiado al portapapeles! Abriendo WhatsApp...");
+            const encodedMessage = encodeURIComponent(message);
+            window.open(`https://api.whatsapp.com/send?text=${encodedMessage}`, '_blank');
+        }).catch(err => {
+            console.error('Error al copiar: ', err);
+        });
+    }
+</script>
+
+</body>
+</html>
