@@ -284,6 +284,7 @@
 
     function sendToWhatsApp() {
         const selectedDay = document.getElementById('daySelect').value;
+        const telefonoDestino = "59896643887";
         
         if (tasks.length === 0) {
             alert("Agrega al menos una tarea antes de enviar el reporte.");
@@ -310,11 +311,10 @@
             });
         }
 
-        // Copiar al portapapeles y abrir WhatsApp
         navigator.clipboard.writeText(message).then(() => {
-            alert("¡Reporte copiado al portapapeles! Abriendo WhatsApp...");
+            alert("¡Reporte copiado! Abriendo WhatsApp...");
             const encodedMessage = encodeURIComponent(message);
-            window.open(`https://api.whatsapp.com/send?text=${encodedMessage}`, '_blank');
+            window.open(`https://wa.me/${telefonoDestino}?text=${encodedMessage}`, '_blank');
         }).catch(err => {
             console.error('Error al copiar: ', err);
         });
